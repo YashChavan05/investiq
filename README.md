@@ -14,70 +14,7 @@ InvestIQ is a premium, stateful **Multi-Agent Financial Intelligence & Portfolio
 
 Unlike naive single-agent prompts or loose ReAct loops, InvestIQ utilizes a strict, stateful **LangGraph State Machine** where each specialized agent executes its calculation, stores its results in the global thread state, and pipes it directly to the next specialized node:
 
-```mermaid
-graph TD
-    %% Layer 1: User Inputs
-    subgraph UI ["💻 1. USER INTERFACE & INPUTS"]
-        Input["Interactive React Dashboard: Tickers • Investment Budget • Risk Preferences • Constraints"]
-    end
-
-    %% Layer 2: Data Ingestion & Preprocessing
-    subgraph Ingestion ["🗄️ 2. DATA INGESTION & PREPROCESSING"]
-        direction LR
-        Hist["💾 Historical Data (ROI & Stock Datasets)"] --> YF["📈 Yahoo Finance (Live Market Prices)"]
-        YF --> News["📰 NewsAPI (Market News & Sentiment)"]
-        News --> Prep["⚙️ Data Preprocessing (Cleaning, Normalization, NLP)"]
-    end
-
-    %% Layer 3: LangGraph Multi-Agent Orchestrator
-    subgraph Orchestrator ["🤖 3. LANGGRAPH MULTI-AGENT ORCHESTRATOR"]
-        LLM_Core["🧠 LLM ORCHESTRATION CORE (RAG & ReAct Reasoning Engine)"]
-        
-        subgraph Pipeline ["Agent Pipeline Nodes"]
-            direction LR
-            Agent_Risk["🛡️ 1. Risk Analyzer<br/>(VaR & Volatility scoring)"] --> Agent_Forecast["📈 2. Forecast Agent<br/>(Ensemble ML models)"]
-            Agent_Forecast --> Agent_Sentiment["📰 3. Sentiment Agent<br/>(Financial News NLP)"]
-            Agent_Sentiment --> Agent_Opt["🎯 4. Optimization Agent<br/>(SLSQP & MPT Optimization)"]
-            Agent_Opt --> Agent_Budget["💰 5. Budget Allocator<br/>(Dynamic allocation)"]
-            Agent_Budget --> Agent_XAI["🔍 6. XAI Agent<br/>(SHAP Explainability)"]
-            Agent_XAI --> Agent_Narration["🤖 7. Narration Agent<br/>(AI synthesis & report)"]
-        end
-        
-        Self_Learning["🔄 SELF-LEARNING ROI LOOP (Continuous Feedback • Performance Evaluation • Model Adaptation)"]
-    end
-
-    %% Layer 4: Observability
-    subgraph Observability ["📊 4. OBSERVABILITY & EXECUTION TRACING"]
-        Logs["LangSmith Monitoring (Real-time Tracing • Performance Audit • Execution Logs)"]
-    end
-
-    %% Layer 5: Output Dashboard
-    subgraph Output_Dashboard ["📋 5. STAKEHOLDER OUTPUT DASHBOARD"]
-        direction LR
-        Out_ROI["📈 ROI FORECAST<br/>(Predictions & Trends)"] --> Out_Plan["💼 PORTFOLIO PLAN<br/>(Optimized Weights & Money splits)"]
-        Out_Plan --> Out_XAI["🧠 EXPLAINABLE AI<br/>(SHAP Attribution Insights)"]
-        Out_XAI --> Out_Alerts["🔔 REPORTS & ALERTS<br/>(Rebalancing suggestions)"]
-    end
-
-    %% Node Connections
-    Input --> Ingestion
-    Ingestion --> LLM_Core
-    LLM_Core --> Pipeline
-    Pipeline --> Self_Learning
-    Self_Learning --> |Adapts predictions| Agent_Risk
-    Pipeline --> Logs
-    Logs --> Output_Dashboard
-
-    %% Custom Styles
-    style LLM_Core fill:#fff7ed,stroke:#ea580c,stroke-width:2px
-    style Self_Learning fill:#fff7ed,stroke:#ea580c,stroke-width:2px
-    style Pipeline fill:#f8fafc,stroke:#cbd5e1,stroke-width:1px
-    style UI fill:#faf5ff,stroke:#d8b4fe,stroke-width:2px
-    style Ingestion fill:#f0fdf4,stroke:#86efac,stroke-width:2px
-    style Orchestrator fill:#fff7ed,stroke:#ffedd5,stroke-width:2px
-    style Observability fill:#f8fafc,stroke:#cbd5e1,stroke-width:2px
-    style Output_Dashboard fill:#faf5ff,stroke:#d8b4fe,stroke-width:2px
-```
+![System Architecture](architecture.png)
 
 ### The 11-Stage Intelligent Pipeline
 
