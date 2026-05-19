@@ -15,27 +15,26 @@ InvestIQ is a premium, stateful **Multi-Agent Financial Intelligence & Portfolio
 Unlike naive single-agent prompts or loose ReAct loops, InvestIQ utilizes a strict, stateful **LangGraph State Machine** where each specialized agent executes its calculation, stores its results in the global thread state, and pipes it directly to the next specialized node:
 
 ```mermaid
-graph TD
-    User([User Request: Tickers & Budget]) --> Risk[1. Risk Analyzer Agent]
-    Risk --> Forecast[2. Market Forecast Agent]
-    Forecast --> News[3. Market Knowledge Agent]
-    News --> Finance[4. Finance Auditor Agent]
-    Finance --> Sustainability[5. Sustainability ESG Agent]
-    Sustainability --> Learning[6. Self-Learning Memory Agent]
-    Learning --> Optimization[7. Finance Optimization Agent]
-    Optimization --> Budget[8. Auto-Budget Allocator]
-    Budget --> XAI[9. XAI ROI Attribution Agent]
-    XAI --> Narration[10. LLM Narration & Synthesis]
-    Narration --> Memory[11. Memory Persistence Agent]
-    Memory --> Out([Final Strategic Portfolio Report])
+graph LR
+    subgraph Data_Intelligence [Phase 1: Market Intelligence]
+        Risk["🛡️ Risk Analyzer"] --> Forecast["📈 Forecast Trend"]
+        Forecast --> News["📰 News Sentiment"]
+        News --> Finance["🏦 Finance Auditor"]
+        Finance --> ESG["🌱 Sustainability ESG"]
+    end
 
-    style Risk fill:#e1f5fe,stroke:#0288d1,stroke-width:2px
-    style Forecast fill:#e1f5fe,stroke:#0288d1,stroke-width:2px
-    style Learning fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
-    style Optimization fill:#fffde7,stroke:#fbc02d,stroke-width:2px
-    style Budget fill:#fffde7,stroke:#fbc02d,stroke-width:2px
-    style XAI fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
-    style Narration fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
+    subgraph Memory_Optimization [Phase 2: Self-Learning & Math]
+        Learning["🧠 Self-Learning"] --> Opt["🎯 SciPy SLSQP Solver"]
+        Opt --> Budget["💰 Auto-Budget"]
+    end
+
+    subgraph Attribution_Delivery [Phase 3: Explainable AI & DB]
+        XAI["🔍 SHAP XAI"] --> CentralLLM["🤖 LLM Synthesis"]
+        CentralLLM --> MemorySave["💾 MongoDB Save"]
+    end
+
+    ESG --> Learning
+    Budget --> XAI
 ```
 
 ### The 11-Stage Intelligent Pipeline
