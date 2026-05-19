@@ -14,7 +14,7 @@ InvestIQ is a premium, stateful **Multi-Agent Financial Intelligence & Portfolio
 
 Unlike naive single-agent prompts or loose ReAct loops, InvestIQ utilizes a strict, stateful **LangGraph State Machine** where each specialized agent executes its calculation, stores its results in the global thread state, and pipes it directly to the next specialized node:
 
-![System Architecture](architecture.png)
+![System Architecture](diagram.png)
 
 ### The 11-Stage Intelligent Pipeline
 
