@@ -15,26 +15,68 @@ InvestIQ is a premium, stateful **Multi-Agent Financial Intelligence & Portfolio
 Unlike naive single-agent prompts or loose ReAct loops, InvestIQ utilizes a strict, stateful **LangGraph State Machine** where each specialized agent executes its calculation, stores its results in the global thread state, and pipes it directly to the next specialized node:
 
 ```mermaid
-graph LR
-    subgraph Data_Intelligence [Phase 1: Market Intelligence]
-        Risk["🛡️ Risk Analyzer"] --> Forecast["📈 Forecast Trend"]
-        Forecast --> News["📰 News Sentiment"]
-        News --> Finance["🏦 Finance Auditor"]
-        Finance --> ESG["🌱 Sustainability ESG"]
+graph TD
+    %% Layer 1: User Inputs
+    subgraph UI ["💻 1. USER INTERFACE & INPUTS"]
+        Input["Interactive React Dashboard: Tickers • Investment Budget • Risk Preferences • Constraints"]
     end
 
-    subgraph Memory_Optimization [Phase 2: Self-Learning & Math]
-        Learning["🧠 Self-Learning"] --> Opt["🎯 SciPy SLSQP Solver"]
-        Opt --> Budget["💰 Auto-Budget"]
+    %% Layer 2: Data Ingestion & Preprocessing
+    subgraph Ingestion ["🗄️ 2. DATA INGESTION & PREPROCESSING"]
+        direction LR
+        Hist["💾 Historical Data (ROI & Stock Datasets)"] --> YF["📈 Yahoo Finance (Live Market Prices)"]
+        YF --> News["📰 NewsAPI (Market News & Sentiment)"]
+        News --> Prep["⚙️ Data Preprocessing (Cleaning, Normalization, NLP)"]
     end
 
-    subgraph Attribution_Delivery [Phase 3: Explainable AI & DB]
-        XAI["🔍 SHAP XAI"] --> CentralLLM["🤖 LLM Synthesis"]
-        CentralLLM --> MemorySave["💾 MongoDB Save"]
+    %% Layer 3: LangGraph Multi-Agent Orchestrator
+    subgraph Orchestrator ["🤖 3. LANGGRAPH MULTI-AGENT ORCHESTRATOR"]
+        LLM_Core["🧠 LLM ORCHESTRATION CORE (RAG & ReAct Reasoning Engine)"]
+        
+        subgraph Pipeline ["Agent Pipeline Nodes"]
+            direction LR
+            Agent_Risk["🛡️ 1. Risk Analyzer<br/>(VaR & Volatility scoring)"] --> Agent_Forecast["📈 2. Forecast Agent<br/>(Ensemble ML models)"]
+            Agent_Forecast --> Agent_Sentiment["📰 3. Sentiment Agent<br/>(Financial News NLP)"]
+            Agent_Sentiment --> Agent_Opt["🎯 4. Optimization Agent<br/>(SLSQP & MPT Optimization)"]
+            Agent_Opt --> Agent_Budget["💰 5. Budget Allocator<br/>(Dynamic allocation)"]
+            Agent_Budget --> Agent_XAI["🔍 6. XAI Agent<br/>(SHAP Explainability)"]
+            Agent_XAI --> Agent_Narration["🤖 7. Narration Agent<br/>(AI synthesis & report)"]
+        end
+        
+        Self_Learning["🔄 SELF-LEARNING ROI LOOP (Continuous Feedback • Performance Evaluation • Model Adaptation)"]
     end
 
-    ESG --> Learning
-    Budget --> XAI
+    %% Layer 4: Observability
+    subgraph Observability ["📊 4. OBSERVABILITY & EXECUTION TRACING"]
+        Logs["LangSmith Monitoring (Real-time Tracing • Performance Audit • Execution Logs)"]
+    end
+
+    %% Layer 5: Output Dashboard
+    subgraph Output_Dashboard ["📋 5. STAKEHOLDER OUTPUT DASHBOARD"]
+        direction LR
+        Out_ROI["📈 ROI FORECAST<br/>(Predictions & Trends)"] --> Out_Plan["💼 PORTFOLIO PLAN<br/>(Optimized Weights & Money splits)"]
+        Out_Plan --> Out_XAI["🧠 EXPLAINABLE AI<br/>(SHAP Attribution Insights)"]
+        Out_XAI --> Out_Alerts["🔔 REPORTS & ALERTS<br/>(Rebalancing suggestions)"]
+    end
+
+    %% Node Connections
+    Input --> Ingestion
+    Ingestion --> LLM_Core
+    LLM_Core --> Pipeline
+    Pipeline --> Self_Learning
+    Self_Learning --> |Adapts predictions| Agent_Risk
+    Pipeline --> Logs
+    Logs --> Output_Dashboard
+
+    %% Custom Styles
+    style LLM_Core fill:#fff7ed,stroke:#ea580c,stroke-width:2px
+    style Self_Learning fill:#fff7ed,stroke:#ea580c,stroke-width:2px
+    style Pipeline fill:#f8fafc,stroke:#cbd5e1,stroke-width:1px
+    style UI fill:#faf5ff,stroke:#d8b4fe,stroke-width:2px
+    style Ingestion fill:#f0fdf4,stroke:#86efac,stroke-width:2px
+    style Orchestrator fill:#fff7ed,stroke:#ffedd5,stroke-width:2px
+    style Observability fill:#f8fafc,stroke:#cbd5e1,stroke-width:2px
+    style Output_Dashboard fill:#faf5ff,stroke:#d8b4fe,stroke-width:2px
 ```
 
 ### The 11-Stage Intelligent Pipeline
@@ -202,8 +244,30 @@ Runs the complete stateful multi-agent LangGraph workflow.
 
 ---
 
-## ⚡ Key Highlights
-* **Zero Hardcoded Data**: Live market calculations are calculated dynamically using real stock history.
-* **Database Feedback Loop**: The Self-Learning agent ensures your system adapts, showing statistical learning in real-time.
-* **Explainable AI (XAI)**: Features absolute SHAP values visualized on the frontend so users never have to trust a black-box model.
-* **Trading Terminal**: Integrates advanced TradingView widgets directly into the user panel for professional asset inspection.
+## 🛠️ Technology Stack
+
+| Component | Technology | Role in System |
+| :--- | :--- | :--- |
+| **Frontend** | React | Modern Single Page Application (SPA) & Interactive Dashboard |
+| **Styling** | Tailwind CSS | Fluid CSS design & responsive premium layout |
+| **Backend** | FastAPI | High-speed, async Python web framework |
+| **AI Orchestration** | LangGraph | Stateful Multi-Agent Execution Graph & Orchestration |
+| **Observability** | LangSmith | Live tracing, monitoring, & debugging of agent runs |
+| **AI / LLM** | Groq (Llama-3) | Low-latency inference & central strategic reasoning |
+| **Database** | MongoDB | Persistent agent memory & historical self-learning loops |
+| **ML Framework** | Scikit-Learn | Local time-series forecasting & ROI trend predictors |
+| **Optimization** | SciPy | Constrained SLSQP portfolio math solver |
+| **Data Processing** | Pandas, NumPy | High-speed financial calculations & preprocessing |
+| **Market Data** | yfinance | Live asset price & historical metrics downloader |
+
+---
+
+## ⚡ Key Features
+
+- **Stateful Multi-Agent Orchestration**: LangGraph-guided pipeline ensuring precise node communication and state synchronization.
+- **Adaptive Self-Learning**: Loop back learning system utilizing past MongoDB prediction errors to dynamically adjust current ROI trends.
+- **Mathematical Optimization**: SciPy SLSQP Solver maximizing return yields while respecting individual user risk guardrails.
+- **Explainable AI (XAI)**: Multi-dimensional SHAP values visualized so no decisions remain black-box.
+- **Real-Time Integration**: Direct download of live global asset indices and breaking financial news.
+- **Scalable & Modular**: High-performance codebase where adding new agents takes a single node addition.
+- **Secure & Enterprise-Ready**: Native `.env` ignoring systems to guarantee zero key leakages.
