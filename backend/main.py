@@ -48,7 +48,11 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "http://localhost:5173",
+        "http://localhost:5180",
+        os.getenv("FRONTEND_URL", "*"),  # Set to your Vercel URL in production
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -157,10 +161,10 @@ async def get_analysis_history():
     """
     Fetch past portfolio analysis results from MongoDB.
     """
-    from agents.db_config import get_database
-    db = get_database()
+    from agents.db_config import reconnect_if_needed
+    db = await reconnect_if_needed()
     if db is None:
-        print("\033[91m> [History Error] Database not initialized\033[0m")
+        print("\033[91m> [History] Database unavailable — returning empty history\033[0m")
         return []
     
     try:
@@ -176,15 +180,19 @@ async def get_analysis_history():
 @app.get("/portfolio/latest")
 async def get_latest_portfolio():
     """Fetch the most recent AI-optimized portfolio from history."""
-    from agents.db_config import get_database
-    db = get_database()
+    from agents.db_config import reconnect_if_needed, db_connection
+    db = await reconnect_if_needed()
     if db is None:
-        return {"success": False, "message": "Database not initialized"}
+        return {
+            "success": False,
+            "message": "Database unavailable. Start MongoDB and the endpoint will auto-reconnect.",
+            "db_connected": db_connection.is_connected,
+        }
     
     try:
         latest = await db.history.find_one({}, sort=[("timestamp", -1)])
         if not latest:
-            return {"success": False, "message": "No portfolio history found."}
+            return {"success": False, "message": "No portfolio history found. Run an analysis first."}
         
         # Extract allocation data. 'results' is the key used by memory_tool.py
         data = latest.get("results") or latest.get("structured_output") or latest
@@ -206,7 +214,7 @@ async def get_latest_portfolio():
         }
     except Exception as e:
         print(f"\033[91m> [Portfolio Error] {e}\033[0m")
-        raise HTTPException(status_code=500, detail=str(e))
+        return {"success": False, "message": f"Portfolio fetch failed: {str(e)}"}
 
 
 @app.post("/market-data")
@@ -399,9 +407,9 @@ async def get_market_indices():
 @app.get("/system/metrics")
 async def get_system_metrics():
     """Calculate actual system metrics from DB and filesystem. No fake data."""
-    from agents.db_config import get_database
+    from agents.db_config import reconnect_if_needed
     import os
-    db = get_database()
+    db = await reconnect_if_needed()
     
     # Start with 0s - no fake data
     metrics = {

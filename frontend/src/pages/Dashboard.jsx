@@ -71,7 +71,11 @@ export default function Dashboard() {
       if (currentTickers.length > 0) setActiveTicker(currentTickers[0]);
       setLastRefresh(new Date());
     } catch (e) {
-      setError('Failed to load market data. Ensure backend and MongoDB are running.');
+      if (e?.code === 'ECONNREFUSED' || e?.message?.includes('Network Error')) {
+        setError('Cannot reach backend. Make sure the FastAPI server is running on port 8000.');
+      } else {
+        setError('Failed to load market data. Check the backend logs for details.');
+      }
     } finally {
       setLoading(false);
     }

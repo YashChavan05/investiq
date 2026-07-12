@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: investiq-backend
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: MONGO_URL
+        sync: false        # Set manually in Render dashboard (keeps secret)
+      - key: DB_NAME
+        value: investiq_db
+      - key: GROQ_API_KEY
+        sync: false
+      - key: NEWS_API_KEY
+        sync: false
+      - key: LANGCHAIN_TRACING_V2
+        value: "false"     # Disable in prod unless you want traces
+    healthCheckPath: /health
