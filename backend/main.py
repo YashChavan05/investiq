@@ -102,6 +102,12 @@ async def root():
     return {"message": "InvestIQ API is running", "version": "1.0.0"}
 
 
+@app.get("/ping")
+async def ping():
+    """Lightweight keep-alive endpoint — called by frontend on load."""
+    return {"ok": True}
+
+
 @app.get("/health")
 async def health():
     return {

@@ -8,6 +8,20 @@ const api = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
+/**
+ * Call this once on app load to wake the Render free-tier backend.
+ * If it responds slowly, the user sees a banner instead of broken data.
+ * Returns true if backend is up, false if it's cold-starting.
+ */
+export const wakeBackend = async () => {
+  try {
+    await api.get('/ping', { timeout: 8000 });
+    return true;
+  } catch {
+    return false;
+  }
+};
+
 // ── Portfolio Analysis ──────────────────────────────────────────────
 export const analyzePortfolio = async ({ tickers, total_budget, risk_threshold = 0.5 }) => {
   const { data } = await api.post('/analyze', { tickers, total_budget, risk_threshold });
