@@ -66,9 +66,18 @@ export default function Dashboard() {
         getMarketIndices(),
       ]);
       
-      setMarketData(mkt.data || {});
+      const data = mkt.data || {};
+      // Filter out tickers that returned errors
+      const validData = Object.fromEntries(
+        Object.entries(data).filter(([, v]) => v && !v.error && v.current_price)
+      );
+
+      setMarketData(validData);
       setIndices(idx || {});
-      if (currentTickers.length > 0) setActiveTicker(currentTickers[0]);
+
+      // Set active ticker to first one that actually has data
+      const validTickers = Object.keys(validData);
+      if (validTickers.length > 0) setActiveTicker(validTickers[0]);
       setLastRefresh(new Date());
     } catch (e) {
       if (e?.code === 'ECONNREFUSED' || e?.message?.includes('Network Error')) {
@@ -174,18 +183,29 @@ export default function Dashboard() {
         <div className="lg:col-span-2 rounded-2xl p-5 shadow-sm" style={{ background: 'var(--card)', border: '1px solid var(--border)' }}>
           <SectionHeader
             title="Price History"
-            subtitle={activeData ? `${activeData.company_name} — ${activeTicker}` : ''}
+            subtitle={activeData?.company_name ? `${activeData.company_name} — ${activeTicker}` : activeTicker}
             action={
               <div className="flex gap-1 overflow-x-auto pb-1 max-w-[200px] md:max-w-none">
-                {portfolioMeta.tickers.map(t => (
-                  <button key={t} onClick={() => setActiveTicker(t)}
-                    className="px-3 py-1 rounded-lg text-xs font-semibold transition-all shadow-sm shrink-0"
-                    style={activeTicker === t
-                      ? { background: '#00C2A8', color: '#FFFFFF' }
-                      : { background: 'var(--surface)', border: '1px solid var(--border)', color: '#64748B' }}>
-                    {t}
-                  </button>
-                ))}
+                {Object.keys(marketData).length > 0
+                  ? Object.keys(marketData).map(t => (
+                    <button key={t} onClick={() => setActiveTicker(t)}
+                      className="px-3 py-1 rounded-lg text-xs font-semibold transition-all shadow-sm shrink-0"
+                      style={activeTicker === t
+                        ? { background: '#00C2A8', color: '#FFFFFF' }
+                        : { background: 'var(--surface)', border: '1px solid var(--border)', color: '#64748B' }}>
+                      {t}
+                    </button>
+                  ))
+                  : portfolioMeta.tickers.map(t => (
+                    <button key={t} onClick={() => setActiveTicker(t)}
+                      className="px-3 py-1 rounded-lg text-xs font-semibold transition-all shadow-sm shrink-0"
+                      style={activeTicker === t
+                        ? { background: '#00C2A8', color: '#FFFFFF' }
+                        : { background: 'var(--surface)', border: '1px solid var(--border)', color: '#64748B' }}>
+                      {t}
+                    </button>
+                  ))
+                }
               </div>
             }
           />

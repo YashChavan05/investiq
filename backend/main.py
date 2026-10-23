@@ -233,14 +233,24 @@ async def get_market_data(request: MarketDataRequest):
         try:
             stock = yf.Ticker(ticker.strip().upper())
             hist = stock.history(period=request.period)
-            info = stock.info
 
             if hist.empty:
+                print(f"[market-data] No history for {ticker}")
                 results[ticker] = {"error": "No data available"}
                 continue
 
+            # yfinance 1.x may return MultiIndex columns — flatten if needed
+            if hasattr(hist.columns, 'levels'):
+                hist.columns = hist.columns.get_level_values(0)
+
             close = hist["Close"]
             daily_returns = close.pct_change().dropna()
+
+            # Fetch info separately with a fallback in case it fails
+            try:
+                info = stock.info or {}
+            except Exception:
+                info = {}
 
             # Chart data for frontend
             chart_data = [
@@ -269,12 +279,14 @@ async def get_market_data(request: MarketDataRequest):
                 "market_cap": info.get("marketCap"),
                 "pe_ratio": info.get("trailingPE"),
                 "dividend_yield": info.get("dividendYield"),
-                "company_name": info.get("longName", ticker.upper()),
+                "company_name": info.get("longName") or info.get("shortName") or ticker.upper(),
                 "sector": info.get("sector", "Unknown"),
-                "chart_data": chart_data[-90:],  # Last 90 data points
+                "chart_data": chart_data[-90:],
                 "volatility_30d": round(float(daily_returns.tail(30).std() * (252 ** 0.5)), 4),
             }
+            print(f"[market-data] ✓ {ticker} — ${results[ticker]['current_price']}")
         except Exception as e:
+            print(f"[market-data] ✗ {ticker} error: {e}")
             results[ticker] = {"ticker": ticker, "error": str(e)}
 
     return {"data": results, "period": request.period}
