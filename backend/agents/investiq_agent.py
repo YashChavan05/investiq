@@ -156,7 +156,7 @@ async def narration_node(state: AgentState):
     
     if groq_api_key:
         try:
-            llm = ChatGroq(model="llama-3.1-8b-instant", temperature=0.1)
+            llm = ChatGroq(model="llama-3.3-70b-versatile", temperature=0.1)
             res = await llm.ainvoke(narration_prompt)
             import re
             match = re.search(r"\{[\s\S]+\}", res.content)
@@ -283,7 +283,7 @@ async def run_casual_chat(message: str) -> str:
     groq_api_key = os.getenv("GROQ_API_KEY")
     if not groq_api_key: return "InvestIQ API Key missing. Please check your .env configuration."
     try:
-        llm = ChatGroq(model="llama-3.1-8b-instant", temperature=0.6)
+        llm = ChatGroq(model="llama-3.3-70b-versatile", temperature=0.6)
         system_prompt = (
             "You are the InvestIQ Senior AI Strategist. You assist users with financial analysis, "
             "portfolio optimization, and market insights. You are aware of the system's 8 agents: "
@@ -348,3 +348,4 @@ async def run_single_agent(agent_id: str, tickers: List[str]) -> Dict[str, Any]:
         return {"success": True, "agent": agent_id, "output": result}
     except Exception as e:
         return {"success": False, "error": str(e)}
+
